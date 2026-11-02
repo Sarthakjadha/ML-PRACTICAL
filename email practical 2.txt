@@ -1,0 +1,191 @@
+1]
+#Import libraries
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+
+from sklearn.metrics import (
+    accuracy_score,
+    confusion_matrix,
+    classification_report,
+    precision_score,
+    recall_score,
+    f1_score
+)
+
+2]
+# Load the dataset
+df = pd.read_csv(r"C:\Users\Sarvadnya\OneDrive\Desktop\second year M\emails.csv")
+
+df.head()
+
+3]
+# understand the dataset
+
+print(df.shape)
+print(" ")
+print(df.head())
+print(" ")
+print(df.info())
+print(" ")
+print(df.isnull().sum().sum())
+
+
+4]
+# preprocess the data
+df = df.drop_duplicates()
+df = df.dropna()
+
+df = df.drop("Email No.", axis=1)
+
+print(df.head())
+print(df.shape)
+
+5]
+
+X = df.drop("Prediction", axis=1)
+
+y = df["Prediction"]
+
+print(X.shape)
+print(y.shape)
+
+6]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+print("Training data:", X_train.shape)
+print("Testing data:", X_test.shape)
+
+7]
+
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+
+X_test = scaler.transform(X_test)
+
+8]
+
+knn = KNeighborsClassifier(n_neighbors=5)
+
+knn.fit(X_train, y_train)
+
+y_pred_knn = knn.predict(X_test)
+
+print("KNN Accuracy:", accuracy_score(y_test, y_pred_knn))
+
+
+9]
+
+svm = SVC()
+
+svm.fit(X_train, y_train)
+
+y_pred_svm = svm.predict(X_test)
+
+print("SVM Accuracy:", accuracy_score(y_test, y_pred_svm))
+
+10]
+print("KNN Classification Report:")
+print(classification_report(y_test, y_pred_knn))
+
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred_knn))
+
+11]
+print("SVM Classification Report:")
+print(classification_report(y_test, y_pred_svm))
+
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred_svm))
+
+12]
+results = pd.DataFrame({
+    "Model": ["KNN", "SVM"],
+    "Accuracy": [
+        accuracy_score(y_test, y_pred_knn),
+        accuracy_score(y_test, y_pred_svm)
+    ],
+    "Precision": [
+        precision_score(y_test, y_pred_knn),
+        precision_score(y_test, y_pred_svm)
+    ],
+    "Recall": [
+        recall_score(y_test, y_pred_knn),
+        recall_score(y_test, y_pred_svm)
+    ],
+    "F1 Score": [
+        f1_score(y_test, y_pred_knn),
+        f1_score(y_test, y_pred_svm)
+    ]
+})
+
+print(results)
+
+13]
+# comparision of model performance
+results.set_index("Model").plot(
+    kind="bar",
+    figsize=(8, 5)
+)
+
+plt.title("KNN vs SVM Performance")
+plt.ylabel("Score")
+plt.ylim(0, 1)
+plt.xticks(rotation=0)
+plt.show()
+
+14]
+
+#Predict an email from the test dataset
+email = X_test[[0]]
+
+prediction = svm.predict(email)
+
+if prediction[0] == 1:
+    print("Email is Spam")
+else:
+    print("Email is Not Spam")
+
+
+#X_test[0] selects one email from the testing dataset.
+#svm.predict() predicts its category.
+#1 means Spam.
+#0 means Not Spam.
+
+15]
+print("Actual Email Category:", y_test.iloc[0])
+print("Predicted Email Category:", prediction[0])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

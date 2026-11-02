@@ -1,0 +1,134 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+
+from sklearn.metrics import (
+    confusion_matrix,
+    accuracy_score,
+    precision_score,
+    recall_score
+)
+
+df = pd.read_csv(r"C:\Users\Sarvadnya\OneDrive\Desktop\second year M\diabetes.csv")
+
+df.head()
+
+2]
+print("Shape:", df.shape)
+print(" ")
+print(df.info())
+print(" ")
+print(df.isnull().sum())
+print(" ")
+print(df.describe())
+
+3]
+df = df.drop_duplicates()
+
+df.isnull().sum()
+
+
+4]
+cols = ["Glucose", "BloodPressure", "SkinThickness",
+        "Insulin", "BMI"]
+
+for col in cols:
+    df[col] = df[col].replace(0, np.nan)
+    df[col] = df[col].fillna(df[col].median())
+
+print(df.isnull().sum())
+
+
+#zero values in Glucose, BloodPressure, SkinThickness, Insulin and BMI can represent missing or invalid measurements.
+#replace these zero values with NaN and fill them using the median.
+
+5]
+X = df.drop("Outcome", axis=1)
+
+y = df["Outcome"]
+
+print(X.head())
+print(y.head())
+
+6]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42
+)
+
+print("Training data:", X_train.shape)
+print("Testing data:", X_test.shape)
+
+7]
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+
+X_test = scaler.transform(X_test)
+
+8]
+knn = KNeighborsClassifier(n_neighbors=5)
+
+knn.fit(X_train, y_train)
+
+y_pred = knn.predict(X_test)
+
+print("KNN Model Trained Successfully!")
+
+9]
+cm = confusion_matrix(y_test, y_pred)
+
+print("Confusion Matrix:")
+print(cm)
+
+
+10]
+accuracy = accuracy_score(y_test, y_pred)
+
+error_rate = 1 - accuracy
+
+precision = precision_score(y_test, y_pred)
+
+recall = recall_score(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+print("Error Rate:", error_rate)
+print("Precision:", precision)
+print("Recall:", recall)
+
+11]
+prediction = knn.predict(X_test[[0]])
+
+if prediction[0] == 1:
+    print("Diabetes Detected")
+else:
+    print("No Diabetes")
+
+12]
+##
+print("Actual Diabetes outcome: ", y_test.iloc[0])
+print("Predicted Diabetes outcome:", prediction[0])
+
+
+
+13]
+##
+for i in range(10):
+
+    prediction = knn.predict(X_test[i].reshape(1, -1))
+
+    print("Actual:", y_test.iloc[i],
+          "Predicted:", prediction[0])
+
+
+
+
+
+
+
